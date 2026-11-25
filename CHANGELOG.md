@@ -3,7 +3,19 @@
 All notable changes to this package are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/) and the package uses [Semantic Versioning](https://semver.org/).
 
-## [0.1.0] - unreleased
+## [0.2.0] - 2026-11-25
+
+### Added
+
+- Wide reporting tables for BI at five grains (account, campaign, ad group, ad, keyword), with ids, names and attributes:
+  `rpt_google_ads__<grain>_daily`, `rpt_google_ads__<grain>_conversion_actions` (per conversion action, with name, category
+  and, for campaigns, attribution event type) and `rpt_google_ads__<grain>_conversion_daily` (chosen conversion actions as
+  columns, built only when `google_ads_pivot_conversion_actions` is set).
+- `int_google_ads__account_conversions_action_day`, and the macros `google_ads_pivot_conversions`, `google_ads_pivot_actions`,
+  `google_ads_pivot_enabled`, `google_ads_conversion_action_slug` and `google_ads_ratio_metrics`.
+- New variable `google_ads_pivot_conversion_actions` (default `[]`). See the README section "Reporting tables for BI".
+
+## [0.1.0] - 2026-11-25
 
 First release.
 
@@ -13,7 +25,6 @@ First release.
 - 18 dimensions and bridges, 28 incremental facts, 12 ephemeral intermediate models.
 - Reporting: weekly account, campaign, conversion action and search term rollups, `rpt_google_ads__anomalies`,
   `rpt_google_ads__narrative_context`.
-- Reporting for BI at five grains (account, campaign, ad group, ad, keyword): `rpt_google_ads__<grain>_daily`, `rpt_google_ads__<grain>_conversion_actions` (per conversion action, with name and category) and `rpt_google_ads__<grain>_conversion_daily` (chosen conversion actions as columns, built only when `google_ads_pivot_conversion_actions` is set), plus `int_google_ads__account_conversions_action_day` and the `google_ads_pivot_*` macros.
 - Macros `google_ads_source`, `google_ads_extract_id` and the feature flag and incremental helpers.
 - Feature flags for every model family (`google_ads__using_<family>`).
 - Tests: grain, keys, relationships, cost reconciliation, conversion consistency.

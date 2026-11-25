@@ -4,7 +4,7 @@ An open source [dbt](https://www.getdbt.com/) package that models Google Ads dat
 **BigQuery Data Transfer Service for Google Ads**. It turns the transfer's report tables into staging views,
 dimensions, daily facts, weekly rollups, anomaly flags and a compact JSON context for narratives.
 
-> **Status: 0.1.0, not yet run against a live warehouse.** The package parses, and every model passes a static
+> **Status: 0.2.0, not yet run against a live warehouse.** The package parses, and every model passes a static
 > BigQuery syntax check, but `dbt build` has not been run on real data. Grain and column roles were derived from
 > column names in a data dictionary, not verified against Google's documentation. See [Known limitations](#known-limitations).
 
@@ -35,7 +35,7 @@ Requires dbt Core `>=1.6.0,<3.0.0` with `dbt-bigquery`.
 # packages.yml
 packages:
   - git: "https://github.com/mockko-ai/dbt-google-ads-bigquery.git"
-    revision: v0.1.0
+    revision: v0.2.0
 ```
 
 Then:
@@ -297,6 +297,7 @@ Every list is ranked in SQL with a fixed sort (value, then id or name as tie-bre
 
 ## Upgrade notes
 
+- **0.2.0**: adds 15 `rpt_google_ads__*` tables, one intermediate model and the variable `google_ads_pivot_conversion_actions`. Nothing existing changes, so no full refresh is needed. The `_daily` and `_conversion_actions` tables build by default; the `_conversion_daily` tables build only when the variable is set. Update `revision` in `packages.yml` to `v0.2.0` and run `dbt deps`.
 - **0.1.0**: first release. Nothing to upgrade from. Facts are incremental: after changing `google_ads_lookback_days` or upgrading across a release that adds columns, run `dbt run --full-refresh -s google_ads_bigquery` once if you need history rebuilt (new columns are appended with `append_new_columns`, but only populated for rebuilt days).
 
 ## Repository layout
