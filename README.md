@@ -75,6 +75,7 @@ vars:
 | `google_ads_anomaly_zscore` | `3` | Z-score beyond which `rpt_google_ads__anomalies` flags a metric. |
 | `google_ads_conversion_tolerance` | `0.005` | Tolerance of the conversion consistency tests (0.5 percent). |
 | `google_ads_date_spine_start` | `2018-01-01` | First day of `dim_google_ads__date`. |
+| `google_ads_pivot_conversion_actions` | `[]` | Conversion action **names** to get their own columns in the `rpt_google_ads__<grain>_conversion_daily` tables (see [Reporting tables for BI](#reporting-tables-for-bi)). Empty means those five tables are not built. |
 
 ### Feature flags
 
@@ -107,7 +108,7 @@ Optional families that need campaign or ad group dims (almost all of them) expec
 
 ## Model catalog
 
-76 staging views, 12 ephemeral intermediate models, 18 dimensions and bridges, 28 facts, 6 reporting models.
+76 staging views, 13 ephemeral intermediate models, 18 dimensions and bridges, 28 facts, 21 reporting models.
 The full list, with source tables and feature flags, is in [`docs/model_catalog.md`](docs/model_catalog.md)
 (generated from the data dictionary by `scripts/generate_model_catalog.py`).
 
@@ -125,6 +126,7 @@ Reporting models:
   week-over-week change; campaigns also get change against the trailing 4-week average and share of account cost.
 - `rpt_google_ads__anomalies`: campaign-day cost, conversions and CPA against the trailing 28 days, flagged beyond `google_ads_anomaly_zscore`.
 - `rpt_google_ads__narrative_context`: one row per customer and week with `payload_json` (see below).
+- 15 wide daily tables at the account, campaign, ad group, ad and keyword grains: `rpt_google_ads__<grain>_daily`, `rpt_google_ads__<grain>_conversion_actions` and `rpt_google_ads__<grain>_conversion_daily` (see [Reporting tables for BI](#reporting-tables-for-bi)).
 
 ### Fact grains
 
@@ -202,6 +204,65 @@ are segmented only (their names list the segments), and so are `budget_daily` an
 - `google_ads_extract_id(resource_name_column, part=none)`: `safe_cast(regexp_extract(col, r'/(\d+)$') as int64)`; with `part=N`, the Nth id of a composite resource name (`customers/1/adGroupAds/222~333`: part 1 is 222, part 2 is 333).
 - `google_ads_enabled('family', ...)`: true if every listed feature flag is on. Used in every model's `config(enabled=...)`.
 - `google_ads_fact_config(families, cluster_by)`, `google_ads_incremental_predicate()`: the shared fact config and lookback filter.
+- `google_ads_pivot_conversions(grain)`, `google_ads_pivot_actions()`, `google_ads_pivot_enabled(grain)`, `google_ads_conversion_action_slug(name)`, `google_ads_ratio_metrics(alias)`: build the `rpt_google_ads__<grain>_conversion_daily` and `_daily` models from `google_ads_pivot_conversion_actions`.
+
+## Reporting tables for BI
+
+Three sets of five tables, one per grain: **account, campaign, ad group, ad, keyword**. All are wide: ids plus the names
+and attributes of the entity and its parents (account name, campaign name, ad group name, ad name, keyword text, ...).
+
+| Set | Models | Grain | Built |
+|---|---|---|---|
+| **Daily** (use these in BI) | `rpt_google_ads__<grain>_daily` | entity x day | always |
+| **Conversion daily** (use these in BI) | `rpt_google_ads__<grain>_conversion_daily` | entity x day, with a column set per conversion action you choose | only when `google_ads_pivot_conversion_actions` is set |
+| **Conversion actions** (reference) | `rpt_google_ads__<grain>_conversion_actions` | entity x day x conversion action (campaign: also x attribution event type) | always |
+
+Tables that end in `_daily` are the ones to query. Tables that end in `_conversion_actions` are the full per-action
+breakdown (action name and category included) to look things up in, or to drill into.
+
+### What is in each set
+
+- **`rpt_google_ads__<grain>_daily`**: impressions, clicks, interactions, cost, conversions, conversions value, view-through
+  conversions, and the ratios `ctr`, `cpc`, `cpm`, `cpa`, `roas`, `cvr`. Ratios are `safe_divide` of that row's measures, so
+  when you aggregate further, sum the measures first and re-divide.
+- **`rpt_google_ads__<grain>_conversion_actions`**: `conversion_action_name`, `conversion_action_category` and `conversions`,
+  `conversions_value` for every action the account has, not only the ones you chose. It has no clicks or cost, because those
+  would repeat on every action row and overstate any sum. For a ratio per action, use the next set.
+- **`rpt_google_ads__<grain>_conversion_daily`**: everything in the matching `_daily` table, plus for each action you list:
+  `<action>_conversions`, `<action>_conversions_value`, `<action>_cvr`, `<action>_cpa`, `<action>_roas`.
+  It is still one row per entity and day, so clicks and cost stay safe to sum.
+
+### Choose the conversion actions
+
+Set the names (as they appear in Google Ads) in your `dbt_project.yml`:
+
+```yaml
+vars:
+  google_ads_bigquery:
+    google_ads_customer_ids: ["1234567890"]
+    google_ads_pivot_conversion_actions: ["Purchase", "Signup"]
+```
+
+Then `dbt run -s rpt_google_ads__campaign_conversion_daily` (or all five) builds, for example:
+
+| campaign_name | date_day | clicks | cost | conversions | purchase_conversions | purchase_cvr | purchase_cpa | signup_conversions | signup_roas |
+|---|---|---|---|---|---|---|---|---|---|
+
+How it behaves:
+
+- Matching is on the action **name**, ignoring case. Column names use a cleaned version of the name:
+  `Purchase (web)` becomes `purchase_web_conversions`. Two names that clean to the same prefix raise an error.
+- A name that matches no data does not fail the build. You get a warning, and its columns are 0, so the schema depends only on your list.
+- Adding or removing an action changes the columns. The tables are rebuilt on each run, so nothing else is needed.
+- With the variable empty, the five `_conversion_daily` tables are switched off and nothing else changes.
+- `conversions` (the total) in all tables comes from the basic stats and counts conversion actions that are included in
+  "Conversions" in Google Ads. A chosen action's columns come from the conversion stats, so they do not have to add up to the total.
+
+### Other ways to use the tables
+
+- To see every action at once, query `rpt_google_ads__<grain>_conversion_actions` and filter or group by `conversion_action_name`.
+- To put clicks and cost next to chosen actions without the variable, sum the actions to one row per entity and day first,
+  then join to `rpt_google_ads__<grain>_daily`. Never join the per-action rows straight to the daily table.
 
 ## Narrative context for LLMs
 

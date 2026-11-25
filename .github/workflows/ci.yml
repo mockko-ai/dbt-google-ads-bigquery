@@ -36,6 +36,9 @@ jobs:
       - name: Package - parse (several customers)
         run: |
           dbt parse --no-partial-parse --vars '{google_ads_customer_ids: ["1234567890", "1234567891"]}'
+      - name: Package - parse (conversion actions chosen)
+        run: |
+          dbt parse --no-partial-parse --vars '{google_ads_customer_ids: ["1234567890"], google_ads_pivot_conversion_actions: ["Purchase", "Sign up (web)"]}'
       - name: Package - parse (every optional family on)
         run: |
           dbt parse --no-partial-parse --vars '{
