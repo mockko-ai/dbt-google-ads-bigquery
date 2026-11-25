@@ -13,6 +13,7 @@ First release.
 - 18 dimensions and bridges, 28 incremental facts, 12 ephemeral intermediate models.
 - Reporting: weekly account, campaign, conversion action and search term rollups, `rpt_google_ads__anomalies`,
   `rpt_google_ads__narrative_context`.
+- Reporting for BI at five grains (account, campaign, ad group, ad, keyword): `rpt_google_ads__<grain>_daily`, `rpt_google_ads__<grain>_conversion_actions` (per conversion action, with name and category) and `rpt_google_ads__<grain>_conversion_daily` (chosen conversion actions as columns, built only when `google_ads_pivot_conversion_actions` is set), plus `int_google_ads__account_conversions_action_day` and the `google_ads_pivot_*` macros.
 - Macros `google_ads_source`, `google_ads_extract_id` and the feature flag and incremental helpers.
 - Feature flags for every model family (`google_ads__using_<family>`).
 - Tests: grain, keys, relationships, cost reconciliation, conversion consistency.

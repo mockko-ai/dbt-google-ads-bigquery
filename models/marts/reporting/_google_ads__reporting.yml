@@ -168,3 +168,553 @@ models:
         tests: [not_null]
       - name: payload_hash
         description: "md5 of payload_json, to trace generated text back to the numbers behind it."
+
+  - name: rpt_google_ads__account_daily
+    description: >
+      Account performance by day: ids, names and attributes of the account and its parents, plus
+      impressions, clicks, interactions, cost, conversions, conversions value and view-through conversions.
+      Ratios (ctr, cpc, cpm, cpa, roas, cvr) are safe_divide of the row's own additive measures, so re-derive them
+      from summed measures when you aggregate further. Intended for BI use.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - date_day
+    columns:
+      - name: customer_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: date_day
+        description: "Day of the stats."
+        tests: [not_null]
+      - name: account_key
+        description: "Surrogate key of the account."
+      - name: account_name
+        description: "Account descriptive name."
+      - name: currency_code
+        description: "Account currency; cost and conversions value are in it."
+      - name: cost
+        description: "Cost in account currency."
+      - name: conversions
+        description: "Total conversions from the basic stats."
+      - name: ctr
+        description: "Clicks divided by impressions."
+      - name: cpc
+        description: "Cost divided by clicks."
+      - name: cpm
+        description: "Cost per 1000 impressions."
+      - name: cpa
+        description: "Cost divided by conversions (null when there are none)."
+      - name: roas
+        description: "Conversions value divided by cost."
+      - name: cvr
+        description: "Conversions divided by clicks."
+
+  - name: rpt_google_ads__campaign_daily
+    description: >
+      Campaign performance by day: ids, names and attributes of the campaign and its parents, plus
+      impressions, clicks, interactions, cost, conversions, conversions value and view-through conversions.
+      Ratios (ctr, cpc, cpm, cpa, roas, cvr) are safe_divide of the row's own additive measures, so re-derive them
+      from summed measures when you aggregate further. Intended for BI use.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - campaign_id
+            - date_day
+    columns:
+      - name: customer_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: campaign_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: date_day
+        description: "Day of the stats."
+        tests: [not_null]
+      - name: campaign_key
+        description: "Surrogate key of the campaign."
+      - name: account_name
+        description: "Account descriptive name."
+      - name: campaign_name
+        description: "Campaign name."
+      - name: campaign_status
+        description: "Campaign status."
+      - name: channel_type
+        description: "Advertising channel type."
+      - name: cost
+        description: "Cost in account currency."
+      - name: conversions
+        description: "Total conversions from the basic stats."
+      - name: ctr
+        description: "Clicks divided by impressions."
+      - name: cpc
+        description: "Cost divided by clicks."
+      - name: cpm
+        description: "Cost per 1000 impressions."
+      - name: cpa
+        description: "Cost divided by conversions (null when there are none)."
+      - name: roas
+        description: "Conversions value divided by cost."
+      - name: cvr
+        description: "Conversions divided by clicks."
+
+  - name: rpt_google_ads__ad_group_daily
+    description: >
+      Ad group performance by day: ids, names and attributes of the ad group and its parents, plus
+      impressions, clicks, interactions, cost, conversions, conversions value and view-through conversions.
+      Ratios (ctr, cpc, cpm, cpa, roas, cvr) are safe_divide of the row's own additive measures, so re-derive them
+      from summed measures when you aggregate further. Intended for BI use.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - ad_group_id
+            - date_day
+    columns:
+      - name: customer_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: ad_group_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: date_day
+        description: "Day of the stats."
+        tests: [not_null]
+      - name: ad_group_key
+        description: "Surrogate key of the ad group."
+      - name: account_name
+        description: "Account descriptive name."
+      - name: campaign_name
+        description: "Campaign name."
+      - name: ad_group_name
+        description: "Ad group name."
+      - name: ad_group_status
+        description: "Ad group status."
+      - name: cost
+        description: "Cost in account currency."
+      - name: conversions
+        description: "Total conversions from the basic stats."
+      - name: ctr
+        description: "Clicks divided by impressions."
+      - name: cpc
+        description: "Cost divided by clicks."
+      - name: cpm
+        description: "Cost per 1000 impressions."
+      - name: cpa
+        description: "Cost divided by conversions (null when there are none)."
+      - name: roas
+        description: "Conversions value divided by cost."
+      - name: cvr
+        description: "Conversions divided by clicks."
+
+  - name: rpt_google_ads__ad_daily
+    description: >
+      Ad performance by day: ids, names and attributes of the ad and its parents, plus
+      impressions, clicks, interactions, cost, conversions, conversions value and view-through conversions.
+      Ratios (ctr, cpc, cpm, cpa, roas, cvr) are safe_divide of the row's own additive measures, so re-derive them
+      from summed measures when you aggregate further. Intended for BI use.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - ad_group_id
+            - ad_id
+            - date_day
+    columns:
+      - name: customer_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: ad_group_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: ad_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: date_day
+        description: "Day of the stats."
+        tests: [not_null]
+      - name: ad_key
+        description: "Surrogate key of the ad (customer, ad group, ad)."
+      - name: account_name
+        description: "Account descriptive name."
+      - name: campaign_name
+        description: "Campaign name."
+      - name: ad_group_name
+        description: "Ad group name."
+      - name: ad_name
+        description: "Ad name."
+      - name: ad_type
+        description: "Ad type."
+      - name: cost
+        description: "Cost in account currency."
+      - name: conversions
+        description: "Total conversions from the basic stats."
+      - name: ctr
+        description: "Clicks divided by impressions."
+      - name: cpc
+        description: "Cost divided by clicks."
+      - name: cpm
+        description: "Cost per 1000 impressions."
+      - name: cpa
+        description: "Cost divided by conversions (null when there are none)."
+      - name: roas
+        description: "Conversions value divided by cost."
+      - name: cvr
+        description: "Conversions divided by clicks."
+
+  - name: rpt_google_ads__keyword_daily
+    description: >
+      Keyword performance by day: ids, names and attributes of the keyword and its parents, plus
+      impressions, clicks, interactions, cost, conversions, conversions value and view-through conversions.
+      Ratios (ctr, cpc, cpm, cpa, roas, cvr) are safe_divide of the row's own additive measures, so re-derive them
+      from summed measures when you aggregate further. Intended for BI use.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - ad_group_id
+            - keyword_id
+            - date_day
+    columns:
+      - name: customer_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: ad_group_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: keyword_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: date_day
+        description: "Day of the stats."
+        tests: [not_null]
+      - name: keyword_key
+        description: "Surrogate key of the keyword (customer, ad group, keyword)."
+      - name: account_name
+        description: "Account descriptive name."
+      - name: campaign_name
+        description: "Campaign name."
+      - name: ad_group_name
+        description: "Ad group name."
+      - name: keyword_text
+        description: "Keyword text."
+      - name: match_type
+        description: "Keyword match type."
+      - name: cost
+        description: "Cost in account currency."
+      - name: conversions
+        description: "Total conversions from the basic stats."
+      - name: ctr
+        description: "Clicks divided by impressions."
+      - name: cpc
+        description: "Cost divided by clicks."
+      - name: cpm
+        description: "Cost per 1000 impressions."
+      - name: cpa
+        description: "Cost divided by conversions (null when there are none)."
+      - name: roas
+        description: "Conversions value divided by cost."
+      - name: cvr
+        description: "Conversions divided by clicks."
+
+  - name: rpt_google_ads__account_conversion_daily
+    description: >
+      Disabled unless var google_ads_pivot_conversion_actions lists at least one conversion action name.
+      rpt_google_ads__account_daily plus, for each listed action, <slug>_conversions, <slug>_conversions_value,
+      <slug>_cvr, <slug>_cpa and <slug>_roas (slug = lower-cased action name with non-alphanumerics as underscores).
+      Still one row per account and day, so every measure stays additive. Actions with no data give zeros,
+      so the schema depends only on the list. Intended for BI use.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - date_day
+    columns:
+      - name: customer_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: date_day
+        description: "Day of the stats."
+        tests: [not_null]
+
+  - name: rpt_google_ads__campaign_conversion_daily
+    description: >
+      Disabled unless var google_ads_pivot_conversion_actions lists at least one conversion action name.
+      rpt_google_ads__campaign_daily plus, for each listed action, <slug>_conversions, <slug>_conversions_value,
+      <slug>_cvr, <slug>_cpa and <slug>_roas (slug = lower-cased action name with non-alphanumerics as underscores).
+      Still one row per campaign and day, so every measure stays additive. Actions with no data give zeros,
+      so the schema depends only on the list. Intended for BI use.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - campaign_id
+            - date_day
+    columns:
+      - name: customer_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: campaign_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: date_day
+        description: "Day of the stats."
+        tests: [not_null]
+
+  - name: rpt_google_ads__ad_group_conversion_daily
+    description: >
+      Disabled unless var google_ads_pivot_conversion_actions lists at least one conversion action name.
+      rpt_google_ads__ad_group_daily plus, for each listed action, <slug>_conversions, <slug>_conversions_value,
+      <slug>_cvr, <slug>_cpa and <slug>_roas (slug = lower-cased action name with non-alphanumerics as underscores).
+      Still one row per ad group and day, so every measure stays additive. Actions with no data give zeros,
+      so the schema depends only on the list. Intended for BI use.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - ad_group_id
+            - date_day
+    columns:
+      - name: customer_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: ad_group_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: date_day
+        description: "Day of the stats."
+        tests: [not_null]
+
+  - name: rpt_google_ads__ad_conversion_daily
+    description: >
+      Disabled unless var google_ads_pivot_conversion_actions lists at least one conversion action name.
+      rpt_google_ads__ad_daily plus, for each listed action, <slug>_conversions, <slug>_conversions_value,
+      <slug>_cvr, <slug>_cpa and <slug>_roas (slug = lower-cased action name with non-alphanumerics as underscores).
+      Still one row per ad and day, so every measure stays additive. Actions with no data give zeros,
+      so the schema depends only on the list. Intended for BI use.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - ad_group_id
+            - ad_id
+            - date_day
+    columns:
+      - name: customer_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: ad_group_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: ad_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: date_day
+        description: "Day of the stats."
+        tests: [not_null]
+
+  - name: rpt_google_ads__keyword_conversion_daily
+    description: >
+      Disabled unless var google_ads_pivot_conversion_actions lists at least one conversion action name.
+      rpt_google_ads__keyword_daily plus, for each listed action, <slug>_conversions, <slug>_conversions_value,
+      <slug>_cvr, <slug>_cpa and <slug>_roas (slug = lower-cased action name with non-alphanumerics as underscores).
+      Still one row per keyword and day, so every measure stays additive. Actions with no data give zeros,
+      so the schema depends only on the list. Intended for BI use.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - ad_group_id
+            - keyword_id
+            - date_day
+    columns:
+      - name: customer_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: ad_group_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: keyword_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: date_day
+        description: "Day of the stats."
+        tests: [not_null]
+
+  - name: rpt_google_ads__account_conversion_actions
+    description: >
+      Reference table: conversions by conversion action. One row per account, day and conversion action,
+      with the action name and category and the names of the account and its parents. Device, network and click type are
+      summed out. It has no clicks or cost, because they would repeat per action row: use
+      rpt_google_ads__account_daily for those, or rpt_google_ads__account_conversion_daily for chosen actions side by side.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - date_day
+            - conversion_action_key
+    columns:
+      - name: customer_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: date_day
+        description: "Day of the conversion stats."
+        tests: [not_null]
+      - name: conversion_action_key
+        description: "Surrogate key of the conversion action (customer plus resource name)."
+      - name: conversion_action_name
+        description: "Conversion action name (latest snapshot)."
+      - name: conversion_action_category
+        description: "Conversion action category (latest snapshot)."
+      - name: conversions
+        description: "Conversions for the action."
+      - name: conversions_value
+        description: "Conversions value for the action."
+
+  - name: rpt_google_ads__campaign_conversion_actions
+    description: >
+      Reference table: conversions by conversion action. One row per campaign, day and conversion action and attribution event type,
+      with the action name and category and the names of the campaign and its parents. Device, network and click type are
+      summed out. It has no clicks or cost, because they would repeat per action row: use
+      rpt_google_ads__campaign_daily for those, or rpt_google_ads__campaign_conversion_daily for chosen actions side by side.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - campaign_id
+            - date_day
+            - conversion_action_key
+            - conversion_attribution_event_type
+    columns:
+      - name: customer_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: campaign_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: date_day
+        description: "Day of the conversion stats."
+        tests: [not_null]
+      - name: conversion_action_key
+        description: "Surrogate key of the conversion action (customer plus resource name)."
+      - name: conversion_action_name
+        description: "Conversion action name (latest snapshot)."
+      - name: conversion_action_category
+        description: "Conversion action category (latest snapshot)."
+      - name: conversion_attribution_event_type
+        description: "Attribution event type of the conversion (for example click through or view through)."
+      - name: conversions
+        description: "Conversions for the action."
+      - name: conversions_value
+        description: "Conversions value for the action."
+
+  - name: rpt_google_ads__ad_group_conversion_actions
+    description: >
+      Reference table: conversions by conversion action. One row per ad group, day and conversion action,
+      with the action name and category and the names of the ad group and its parents. Device, network and click type are
+      summed out. It has no clicks or cost, because they would repeat per action row: use
+      rpt_google_ads__ad_group_daily for those, or rpt_google_ads__ad_group_conversion_daily for chosen actions side by side.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - ad_group_id
+            - date_day
+            - conversion_action_key
+    columns:
+      - name: customer_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: ad_group_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: date_day
+        description: "Day of the conversion stats."
+        tests: [not_null]
+      - name: conversion_action_key
+        description: "Surrogate key of the conversion action (customer plus resource name)."
+      - name: conversion_action_name
+        description: "Conversion action name (latest snapshot)."
+      - name: conversion_action_category
+        description: "Conversion action category (latest snapshot)."
+      - name: conversions
+        description: "Conversions for the action."
+      - name: conversions_value
+        description: "Conversions value for the action."
+
+  - name: rpt_google_ads__ad_conversion_actions
+    description: >
+      Reference table: conversions by conversion action. One row per ad, day and conversion action,
+      with the action name and category and the names of the ad and its parents. Device, network and click type are
+      summed out. It has no clicks or cost, because they would repeat per action row: use
+      rpt_google_ads__ad_daily for those, or rpt_google_ads__ad_conversion_daily for chosen actions side by side.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - ad_group_id
+            - ad_id
+            - date_day
+            - conversion_action_key
+    columns:
+      - name: customer_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: ad_group_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: ad_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: date_day
+        description: "Day of the conversion stats."
+        tests: [not_null]
+      - name: conversion_action_key
+        description: "Surrogate key of the conversion action (customer plus resource name)."
+      - name: conversion_action_name
+        description: "Conversion action name (latest snapshot)."
+      - name: conversion_action_category
+        description: "Conversion action category (latest snapshot)."
+      - name: conversions
+        description: "Conversions for the action."
+      - name: conversions_value
+        description: "Conversions value for the action."
+
+  - name: rpt_google_ads__keyword_conversion_actions
+    description: >
+      Reference table: conversions by conversion action. One row per keyword, day and conversion action,
+      with the action name and category and the names of the keyword and its parents. Device, network and click type are
+      summed out. It has no clicks or cost, because they would repeat per action row: use
+      rpt_google_ads__keyword_daily for those, or rpt_google_ads__keyword_conversion_daily for chosen actions side by side.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - ad_group_id
+            - keyword_id
+            - date_day
+            - conversion_action_key
+    columns:
+      - name: customer_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: ad_group_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: keyword_id
+        description: "Google Ads id."
+        tests: [not_null]
+      - name: date_day
+        description: "Day of the conversion stats."
+        tests: [not_null]
+      - name: conversion_action_key
+        description: "Surrogate key of the conversion action (customer plus resource name)."
+      - name: conversion_action_name
+        description: "Conversion action name (latest snapshot)."
+      - name: conversion_action_category
+        description: "Conversion action category (latest snapshot)."
+      - name: conversions
+        description: "Conversions for the action."
+      - name: conversions_value
+        description: "Conversions value for the action."
