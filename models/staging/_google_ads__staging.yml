@@ -1,0 +1,307 @@
+version: 2
+
+models:
+  - name: stg_google_ads__account_basic_stats
+    description: >
+      One row per grain of the AccountBasicStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: customer_id, segments_ad_network_type, segments_date, segments_device, segments_slot.
+  - name: stg_google_ads__account_conversion_stats
+    description: >
+      One row per grain of the AccountConversionStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: customer_id, segments_ad_network_type, segments_click_type, segments_conversion_action, segments_conversion_action_category, segments_conversion_action_name, segments_date, segments_device, segments_slot.
+  - name: stg_google_ads__account_non_click_stats
+    description: >
+      One row per grain of the AccountNonClickStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: customer_id, segments_ad_network_type, segments_date.
+  - name: stg_google_ads__ad
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the Ad report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: ad_group_ad_ad_id, ad_group_id, campaign_id, customer_id.
+  - name: stg_google_ads__ad_basic_stats
+    description: >
+      One row per grain of the AdBasicStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_ad_ad_id, ad_group_id, campaign_id, customer_id, segments_ad_network_type, segments_date, segments_device, segments_slot.
+  - name: stg_google_ads__ad_conversion_stats
+    description: >
+      One row per grain of the AdConversionStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_ad_ad_id, ad_group_id, campaign_id, customer_id, segments_ad_network_type, segments_click_type, segments_conversion_action, segments_conversion_action_category, segments_conversion_action_name, segments_date, segments_device, segments_slot.
+  - name: stg_google_ads__ad_group
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the AdGroup report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: ad_group_id, campaign_id, customer_id.
+  - name: stg_google_ads__ad_group_audience
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the AdGroupAudience report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: ad_group_criterion_criterion_id, ad_group_id, customer_id.
+  - name: stg_google_ads__ad_group_audience_basic_stats
+    description: >
+      One row per grain of the AdGroupAudienceBasicStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_criterion_criterion_id, ad_group_id, customer_id, segments_ad_network_type, segments_date, segments_device, segments_slot.
+  - name: stg_google_ads__ad_group_audience_conversion_stats
+    description: >
+      One row per grain of the AdGroupAudienceConversionStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_criterion_criterion_id, ad_group_id, customer_id, segments_ad_network_type, segments_conversion_action, segments_conversion_action_category, segments_conversion_action_name, segments_date, segments_device.
+  - name: stg_google_ads__ad_group_basic_stats
+    description: >
+      One row per grain of the AdGroupBasicStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_id, campaign_id, customer_id, segments_ad_network_type, segments_date, segments_device, segments_slot.
+  - name: stg_google_ads__ad_group_bid_modifier
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the AdGroupBidModifier report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: ad_group_bid_modifier_criterion_id, ad_group_id.
+  - name: stg_google_ads__ad_group_conversion_stats
+    description: >
+      One row per grain of the AdGroupConversionStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_id, campaign_id, customer_id, segments_ad_network_type, segments_click_type, segments_conversion_action, segments_conversion_action_category, segments_conversion_action_name, segments_date, segments_device, segments_slot.
+  - name: stg_google_ads__ad_group_criterion
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the AdGroupCriterion report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: ad_group_criterion_criterion_id, ad_group_id.
+  - name: stg_google_ads__ad_group_criterion_label
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the AdGroupCriterionLabel report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: ad_group_criterion_criterion_id, label_id.
+  - name: stg_google_ads__ad_group_label
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the AdGroupLabel report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: ad_group_id, label_id.
+  - name: stg_google_ads__ad_label
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the AdGroupAdLabel report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: ad_group_id, label_id.
+  - name: stg_google_ads__age_range
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the AgeRange report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: ad_group_criterion_criterion_id, ad_group_id, campaign_id, customer_id.
+  - name: stg_google_ads__age_range_basic_stats
+    description: >
+      One row per grain of the AgeRangeBasicStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_criterion_criterion_id, ad_group_id, campaign_id, customer_id, segments_ad_network_type, segments_date, segments_device.
+  - name: stg_google_ads__age_range_conversion_stats
+    description: >
+      One row per grain of the AgeRangeConversionStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_criterion_criterion_id, ad_group_id, campaign_id, customer_id, segments_ad_network_type, segments_click_type, segments_conversion_action, segments_conversion_action_category, segments_conversion_action_name, segments_date, segments_device.
+  - name: stg_google_ads__asset
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the Asset report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: asset_id.
+  - name: stg_google_ads__asset_group
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the AssetGroup report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: asset_group_id.
+  - name: stg_google_ads__asset_group_asset
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the AssetGroupAsset report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: see data dictionary.
+  - name: stg_google_ads__asset_group_listing_group_filter
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the AssetGroupListingGroupFilter report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: asset_group_listing_group_filter_case_value_product_category_category_id, asset_group_listing_group_filter_id.
+  - name: stg_google_ads__asset_group_product_group_stats
+    description: >
+      One row per grain of the AssetGroupProductGroupStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: segments_ad_network_type, segments_date, segments_device.
+  - name: stg_google_ads__asset_group_signal
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the AssetGroupSignal report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: see data dictionary.
+  - name: stg_google_ads__audience
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the Audience report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: audience_id.
+  - name: stg_google_ads__bid_goal
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the BidGoal report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: bidding_strategy_id, customer_id.
+  - name: stg_google_ads__bid_goal_conversion_stats
+    description: >
+      One row per grain of the BidGoalConversionStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: bidding_strategy_id, customer_id, segments_conversion_action, segments_conversion_action_category, segments_conversion_action_name, segments_date, segments_device.
+  - name: stg_google_ads__bid_goal_stats
+    description: >
+      One row per grain of the BidGoalStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: bidding_strategy_id, customer_id, segments_date, segments_device.
+  - name: stg_google_ads__budget
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the Budget report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: campaign_budget_id, customer_id.
+  - name: stg_google_ads__budget_stats
+    description: >
+      One row per grain of the BudgetStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: campaign_budget_id, campaign_id, customer_id, segments_date.
+  - name: stg_google_ads__campaign
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the Campaign report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: campaign_id, customer_id.
+  - name: stg_google_ads__campaign_asset_stats
+    description: >
+      One row per grain of the CampaignAssetStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: segments_ad_network_type, segments_date, segments_device.
+  - name: stg_google_ads__campaign_audience
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the CampaignAudience report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: campaign_criterion_criterion_id, campaign_id, customer_id.
+  - name: stg_google_ads__campaign_audience_basic_stats
+    description: >
+      One row per grain of the CampaignAudienceBasicStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: campaign_criterion_criterion_id, campaign_id, customer_id, segments_ad_network_type, segments_date, segments_device, segments_slot.
+  - name: stg_google_ads__campaign_audience_conversion_stats
+    description: >
+      One row per grain of the CampaignAudienceConversionStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: campaign_criterion_criterion_id, campaign_id, customer_id, segments_ad_network_type, segments_conversion_action, segments_conversion_action_category, segments_conversion_action_name, segments_date, segments_device.
+  - name: stg_google_ads__campaign_basic_stats
+    description: >
+      One row per grain of the CampaignBasicStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: campaign_id, customer_id, segments_ad_network_type, segments_date, segments_device, segments_slot.
+  - name: stg_google_ads__campaign_conversion_stats
+    description: >
+      One row per grain of the CampaignConversionStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: campaign_id, customer_id, segments_ad_network_type, segments_conversion_action, segments_conversion_action_category, segments_conversion_action_name, segments_conversion_attribution_event_type, segments_date, segments_slot.
+  - name: stg_google_ads__campaign_criterion
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the CampaignCriterion report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: campaign_criterion_criterion_id, campaign_id.
+  - name: stg_google_ads__campaign_label
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the CampaignLabel report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: campaign_id, label_id.
+  - name: stg_google_ads__campaign_location_target_stats
+    description: >
+      One row per grain of the CampaignLocationTargetStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: campaign_criterion_criterion_id, campaign_id, customer_id, segments_date.
+  - name: stg_google_ads__click_stats
+    description: >
+      One row per grain of the ClickStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_id, campaign_id, customer_id, segments_ad_network_type, segments_click_type, segments_date, segments_device, segments_slot.
+  - name: stg_google_ads__customer
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the Customer report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: customer_id.
+  - name: stg_google_ads__gender
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the Gender report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: ad_group_criterion_criterion_id, ad_group_id, campaign_id, customer_id.
+  - name: stg_google_ads__gender_basic_stats
+    description: >
+      One row per grain of the GenderBasicStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_criterion_criterion_id, ad_group_id, campaign_id, customer_id, segments_ad_network_type, segments_date, segments_device.
+  - name: stg_google_ads__gender_conversion_stats
+    description: >
+      One row per grain of the GenderConversionStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_criterion_criterion_id, ad_group_id, campaign_id, customer_id, segments_ad_network_type, segments_click_type, segments_conversion_action, segments_conversion_action_category, segments_conversion_action_name, segments_date, segments_device.
+  - name: stg_google_ads__geo_conversion_stats
+    description: >
+      One row per grain of the GeoConversionStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_id, campaign_id, customer_id, geographic_view_country_criterion_id, segments_ad_network_type, segments_conversion_action, segments_conversion_action_category, segments_conversion_action_name, segments_date, segments_device, segments_geo_target_most_specific_location.
+  - name: stg_google_ads__geo_stats
+    description: >
+      One row per grain of the GeoStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_id, campaign_id, customer_id, geographic_view_country_criterion_id, segments_ad_network_type, segments_date, segments_device, segments_geo_target_most_specific_location.
+  - name: stg_google_ads__hourly_account_conversion_stats
+    description: >
+      One row per grain of the HourlyAccountConversionStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: customer_id, segments_ad_network_type, segments_click_type, segments_conversion_action, segments_conversion_action_category, segments_conversion_action_name, segments_date, segments_device, segments_hour.
+  - name: stg_google_ads__hourly_account_stats
+    description: >
+      One row per grain of the HourlyAccountStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: customer_id, segments_ad_network_type, segments_click_type, segments_date, segments_device, segments_hour.
+  - name: stg_google_ads__hourly_ad_group_conversion_stats
+    description: >
+      One row per grain of the HourlyAdGroupConversionStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_id, campaign_id, customer_id, segments_ad_network_type, segments_click_type, segments_conversion_action, segments_conversion_action_category, segments_conversion_action_name, segments_date, segments_device, segments_hour.
+  - name: stg_google_ads__hourly_ad_group_stats
+    description: >
+      One row per grain of the HourlyAdGroupStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_id, campaign_id, customer_id, segments_ad_network_type, segments_click_type, segments_date, segments_device, segments_hour.
+  - name: stg_google_ads__hourly_bid_goal_stats
+    description: >
+      One row per grain of the HourlyBidGoalStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: bidding_strategy_id, customer_id, segments_date, segments_device, segments_hour.
+  - name: stg_google_ads__hourly_campaign_conversion_stats
+    description: >
+      One row per grain of the HourlyCampaignConversionStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: campaign_id, customer_id, segments_ad_network_type, segments_click_type, segments_conversion_action, segments_conversion_action_category, segments_conversion_action_name, segments_date, segments_device, segments_hour.
+  - name: stg_google_ads__hourly_campaign_stats
+    description: >
+      One row per grain of the HourlyCampaignStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: campaign_id, customer_id, segments_ad_network_type, segments_click_type, segments_date, segments_device, segments_hour.
+  - name: stg_google_ads__keyword
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the Keyword report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: ad_group_criterion_criterion_id, ad_group_id, campaign_id, customer_id.
+  - name: stg_google_ads__keyword_basic_stats
+    description: >
+      One row per grain of the KeywordBasicStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_criterion_criterion_id, ad_group_id, campaign_id, customer_id, segments_ad_network_type, segments_date, segments_device, segments_slot.
+  - name: stg_google_ads__keyword_conversion_stats
+    description: >
+      One row per grain of the KeywordConversionStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_criterion_criterion_id, ad_group_id, campaign_id, customer_id, segments_ad_network_type, segments_click_type, segments_conversion_action, segments_conversion_action_category, segments_conversion_action_name, segments_date, segments_device, segments_slot.
+  - name: stg_google_ads__location_based_campaign_criterion
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the LocationBasedCampaignCriterion report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: campaign_criterion_criterion_id, campaign_id, customer_id.
+  - name: stg_google_ads__paid_organic_stats
+    description: >
+      One row per grain of the PaidOrganicStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_id, campaign_id, customer_id, segments_date, segments_search_engine_results_page_type.
+  - name: stg_google_ads__parental_status
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the ParentalStatus report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: ad_group_criterion_criterion_id, ad_group_id, campaign_id, customer_id.
+  - name: stg_google_ads__parental_status_basic_stats
+    description: >
+      One row per grain of the ParentalStatusBasicStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_criterion_criterion_id, ad_group_id, campaign_id, customer_id, segments_ad_network_type, segments_date, segments_device.
+  - name: stg_google_ads__parental_status_conversion_stats
+    description: >
+      One row per grain of the ParentalStatusConversionStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_criterion_criterion_id, ad_group_id, campaign_id, customer_id, segments_ad_network_type, segments_click_type, segments_conversion_action, segments_conversion_action_category, segments_conversion_action_name, segments_date, segments_device.
+  - name: stg_google_ads__placement
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the Placement report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: ad_group_criterion_criterion_id, ad_group_id, campaign_id, customer_id.
+  - name: stg_google_ads__placement_basic_stats
+    description: >
+      One row per grain of the PlacementBasicStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_criterion_criterion_id, ad_group_id, campaign_id, customer_id, segments_ad_network_type, segments_date, segments_device.
+  - name: stg_google_ads__placement_conversion_stats
+    description: >
+      One row per grain of the PlacementConversionStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_criterion_criterion_id, ad_group_id, campaign_id, customer_id, segments_ad_network_type, segments_click_type, segments_conversion_action, segments_conversion_action_category, segments_conversion_action_name, segments_date, segments_device.
+  - name: stg_google_ads__product_group_stats
+    description: >
+      One row per grain of the ProductGroupStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_criterion_criterion_id, ad_group_criterion_listing_group_case_value_product_category_category_id, ad_group_id, campaign_id, segments_date.
+  - name: stg_google_ads__search_query_conversion_stats
+    description: >
+      One row per grain of the SearchQueryConversionStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_ad_ad_id, ad_group_id, campaign_id, customer_id, segments_ad_network_type, segments_conversion_action, segments_conversion_action_category, segments_conversion_action_name, segments_date, segments_device, segments_keyword_ad_group_criterion, segments_search_term_match_type.
+  - name: stg_google_ads__search_query_stats
+    description: >
+      One row per grain of the SearchQueryStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_ad_ad_id, ad_group_id, campaign_id, customer_id, segments_ad_network_type, segments_date, segments_device, segments_keyword_ad_group_criterion, segments_search_term_match_type, search_term_view_search_term.
+  - name: stg_google_ads__shopping_product_conversion_stats
+    description: >
+      One row per grain of the ShoppingProductConversionStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_id, campaign_id, customer_id, segments_product_aggregator_id, segments_product_item_id, segments_product_merchant_id, segments_product_store_id, segments_ad_network_type, segments_click_type, segments_conversion_action, segments_conversion_action_category, segments_conversion_action_name, segments_date, segments_device, segments_product_brand, segments_product_category_level1, segments_product_category_level2, segments_product_category_level3, segments_product_category_level4, segments_product_category_level5, segments_product_channel, segments_product_channel_exclusivity, segments_product_condition, segments_product_country, segments_product_custom_attribute0, segments_product_custom_attribute1, segments_product_custom_attribute2, segments_product_custom_attribute3, segments_product_custom_attribute4, segments_product_language, segments_product_type_l1, segments_product_type_l2, segments_product_type_l3, segments_product_type_l4, segments_product_type_l5.
+  - name: stg_google_ads__shopping_product_stats
+    description: >
+      One row per grain of the ShoppingProductStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_id, campaign_id, customer_id, segments_product_aggregator_id, segments_product_item_id, segments_product_merchant_id, segments_ad_network_type, segments_date, segments_device, segments_product_brand, segments_product_category_level1, segments_product_category_level2, segments_product_category_level3, segments_product_category_level4, segments_product_category_level5, segments_product_channel, segments_product_channel_exclusivity, segments_product_condition, segments_product_country, segments_product_custom_attribute0, segments_product_custom_attribute1, segments_product_custom_attribute2, segments_product_custom_attribute3, segments_product_custom_attribute4, segments_product_language, segments_product_type_l1, segments_product_type_l2, segments_product_type_l3, segments_product_type_l4, segments_product_type_l5.
+  - name: stg_google_ads__video
+    description: >
+      Latest snapshot (_DATA_DATE = _LATEST_DATE) of the Video report from the Google Ads transfer, renamed and with micros converted to currency.
+      Grain: ad_group_id, campaign_id, customer_id, video_id.
+  - name: stg_google_ads__video_basic_stats
+    description: >
+      One row per grain of the VideoBasicStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_ad_ad_id, ad_group_id, campaign_id, customer_id, video_channel_id, video_id, segments_ad_network_type, segments_date, segments_device.
+  - name: stg_google_ads__video_conversion_stats
+    description: >
+      One row per grain of the VideoConversionStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_ad_ad_id, ad_group_id, campaign_id, customer_id, video_channel_id, video_id, segments_ad_network_type, segments_click_type, segments_conversion_action, segments_conversion_action_category, segments_conversion_action_name, segments_date, segments_device.
+  - name: stg_google_ads__video_non_click_stats
+    description: >
+      One row per grain of the VideoNonClickStats report from the Google Ads transfer. Additive metrics only; micros are converted to currency; no joins, aggregation or ratios.
+      Grain: ad_group_ad_ad_id, ad_group_id, campaign_id, customer_id, video_channel_id, video_id, segments_ad_network_type, segments_date, segments_device.

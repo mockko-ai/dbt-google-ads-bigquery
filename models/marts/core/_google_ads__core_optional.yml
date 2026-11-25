@@ -1,0 +1,1350 @@
+version: 2
+
+models:
+  - name: dim_google_ads__demographic
+    description: "One row per demographic criterion (age range, gender or parental status) per ad group, unioned with a demographic_type column."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - demographic_key
+    columns:
+      - name: demographic_key
+        description: "Surrogate key for the demographic criterion: type, customer, ad group and criterion id."
+        tests:
+          - not_null
+          - unique
+      - name: demographic_type
+        description: "age_range, gender or parental_status."
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+      - name: campaign_id
+        description: "Google Ads campaign id."
+      - name: ad_group_id
+        description: "Google Ads ad group id."
+      - name: criterion_id
+        description: "Criterion id of the target. Repeats across ad groups."
+      - name: demographic_value
+        description: "Value of the demographic criterion (for example AGE_RANGE_25_34, MALE, PARENT)."
+      - name: is_negative
+        description: "True for a negative keyword."
+      - name: status
+        description: "Status as of the latest snapshot."
+      - name: bid_modifier
+        description: "Bid modifier of the target."
+
+  - name: dim_google_ads__audience_target
+    description: "One row per audience target at ad group or campaign level. The audience reports carry no audience name and no id that links to ads_Audience, so no name is available."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - audience_target_key
+    columns:
+      - name: audience_target_key
+        description: "Surrogate key for the audience target: level, customer, campaign or ad group and criterion id."
+        tests:
+          - not_null
+          - unique
+      - name: level
+        description: "ad_group or campaign: the level the audience target is attached to."
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+      - name: campaign_id
+        description: "Google Ads campaign id."
+      - name: ad_group_id
+        description: "Google Ads ad group id."
+      - name: criterion_id
+        description: "Criterion id of the target. Repeats across ad groups."
+      - name: status
+        description: "Status as of the latest snapshot."
+      - name: bid_modifier
+        description: "Bid modifier of the target."
+
+  - name: dim_google_ads__placement
+    description: "One row per placement (website, app or channel) targeted or excluded in an ad group."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - placement_key
+    columns:
+      - name: placement_key
+        description: "Surrogate key for the placement: customer, ad group and criterion id."
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+      - name: campaign_id
+        description: "Google Ads campaign id."
+      - name: ad_group_id
+        description: "Google Ads ad group id."
+      - name: criterion_id
+        description: "Criterion id of the target. Repeats across ad groups."
+      - name: placement_url
+        description: "Placement URL (website, app or channel)."
+      - name: is_negative
+        description: "True for a negative keyword."
+      - name: status
+        description: "Status as of the latest snapshot."
+      - name: bid_modifier
+        description: "Bid modifier of the target."
+
+  - name: dim_google_ads__video
+    description: "One row per video per ad group, from the latest snapshot."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - video_key
+    columns:
+      - name: video_key
+        description: "Surrogate key for the video: customer, ad group and video id."
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+      - name: campaign_id
+        description: "Google Ads campaign id."
+      - name: ad_group_id
+        description: "Google Ads ad group id."
+      - name: video_id
+        description: "YouTube video id."
+      - name: title
+        description: "Video title."
+      - name: duration_millis
+        description: "Video duration in milliseconds."
+      - name: ad_status
+        description: "Status of the video ad."
+
+  - name: dim_google_ads__asset
+    description: "One row per asset. The asset report has no customer_id, so it is read from the source table name."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - asset_key
+    columns:
+      - name: asset_key
+        description: "Surrogate key for the asset."
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+      - name: asset_id
+        description: "Asset id (parsed from a resource name where needed)."
+      - name: name
+        description: "Name."
+      - name: type
+        description: "Type."
+      - name: source
+        description: "Source of the asset (advertiser or automatically created)."
+      - name: final_urls
+        description: "Final URLs."
+
+  - name: dim_google_ads__asset_group
+    description: "One row per Performance Max asset group. The campaign id is parsed from the asset group campaign resource name."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - asset_group_key
+    columns:
+      - name: asset_group_key
+        description: "Surrogate key for the asset group."
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+      - name: campaign_id
+        description: "Google Ads campaign id."
+      - name: asset_group_id
+        description: "Performance Max asset group id."
+      - name: name
+        description: "Name."
+      - name: status
+        description: "Status as of the latest snapshot."
+      - name: final_urls
+        description: "Final URLs."
+      - name: final_mobile_urls
+        description: "Final mobile URLs."
+
+  - name: bridge_google_ads__asset_group_asset
+    description: "Bridge between Performance Max asset groups and assets with the asset role (field type)."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - asset_group_asset_key
+    columns:
+      - name: asset_group_asset_key
+        description: "Surrogate key for the asset group and asset pair, with the asset field type."
+        tests:
+          - not_null
+          - unique
+      - name: asset_group_key
+        description: "Surrogate key for the asset group."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__asset_group')
+              field: asset_group_key
+              config:
+                severity: warn
+      - name: asset_key
+        description: "Surrogate key for the asset."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__asset')
+              field: asset_key
+              config:
+                severity: warn
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+        tests:
+          - not_null
+      - name: asset_group_id
+        description: "Performance Max asset group id."
+        tests:
+          - not_null
+      - name: asset_id
+        description: "Asset id (parsed from a resource name where needed)."
+        tests:
+          - not_null
+      - name: field_type
+        description: "Role of the asset in the group (HEADLINE, LONG_HEADLINE, MARKETING_IMAGE, ...)."
+      - name: source
+        description: "Source of the asset (advertiser or automatically created)."
+      - name: approval_status
+        description: "Policy approval status."
+
+  - name: dim_google_ads__bidding_strategy
+    description: "One row per portfolio bidding strategy from the latest snapshot."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - bidding_strategy_key
+    columns:
+      - name: bidding_strategy_key
+        description: "Surrogate key for the portfolio bidding strategy."
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+      - name: bidding_strategy_id
+        description: "Portfolio bidding strategy id."
+      - name: name
+        description: "Name."
+      - name: type
+        description: "Type."
+      - name: status
+        description: "Status as of the latest snapshot."
+      - name: target_cpa
+        description: "Target CPA in account currency."
+      - name: target_roas
+        description: "Target ROAS."
+      - name: target_spend
+        description: "Target spend (maximize clicks) in account currency."
+
+  - name: fct_google_ads__demographic_daily
+    description: "Age range, gender and parental status performance by day, device and network, with a demographic_type column."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - demographic_key
+            - date_day
+            - device
+            - ad_network_type
+    columns:
+      - name: demographic_key
+        description: "Surrogate key for the demographic criterion: type, customer, ad group and criterion id."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__demographic')
+              field: demographic_key
+              config:
+                severity: warn
+      - name: demographic_type
+        description: "age_range, gender or parental_status."
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+      - name: campaign_id
+        description: "Google Ads campaign id."
+      - name: ad_group_id
+        description: "Google Ads ad group id."
+      - name: criterion_id
+        description: "Criterion id of the target. Repeats across ad groups."
+      - name: date_day
+        description: "Calendar day (segments.date) in the account time zone."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__date')
+              field: date_day
+              config:
+                severity: warn
+      - name: device
+        description: "Device segment (MOBILE, DESKTOP, TABLET, ...)."
+        tests:
+          - not_null
+      - name: ad_network_type
+        description: "Ad network type segment (SEARCH, CONTENT, YOUTUBE_WATCH, ...)."
+        tests:
+          - not_null
+      - name: impressions
+        description: "Impressions (additive)."
+      - name: clicks
+        description: "Clicks (additive)."
+      - name: interactions
+        description: "Interactions (additive)."
+      - name: cost
+        description: "Cost in account currency (additive). Converted from micros."
+      - name: conversions
+        description: "Conversions, possibly fractional (additive)."
+      - name: conversions_value
+        description: "Conversion value in account currency (additive)."
+      - name: view_through_conversions
+        description: "View-through conversions (additive)."
+
+  - name: fct_google_ads__demographic_conversion_daily
+    description: "Demographic conversions split by conversion action."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - demographic_key
+            - date_day
+            - conversion_action_key
+            - click_type
+            - device
+            - ad_network_type
+    columns:
+      - name: demographic_key
+        description: "Surrogate key for the demographic criterion: type, customer, ad group and criterion id."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__demographic')
+              field: demographic_key
+              config:
+                severity: warn
+      - name: conversion_action_key
+        description: "Surrogate key for the conversion action (customer_id, conversion action resource name)."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__conversion_action')
+              field: conversion_action_key
+              config:
+                severity: warn
+      - name: demographic_type
+        description: "age_range, gender or parental_status."
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+      - name: campaign_id
+        description: "Google Ads campaign id."
+      - name: ad_group_id
+        description: "Google Ads ad group id."
+      - name: criterion_id
+        description: "Criterion id of the target. Repeats across ad groups."
+      - name: date_day
+        description: "Calendar day (segments.date) in the account time zone."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__date')
+              field: date_day
+              config:
+                severity: warn
+      - name: conversion_action
+        description: "Conversion action resource name (customers/<id>/conversionActions/<id>)."
+      - name: click_type
+        description: "Click type segment."
+        tests:
+          - not_null
+      - name: device
+        description: "Device segment (MOBILE, DESKTOP, TABLET, ...)."
+        tests:
+          - not_null
+      - name: ad_network_type
+        description: "Ad network type segment (SEARCH, CONTENT, YOUTUBE_WATCH, ...)."
+        tests:
+          - not_null
+      - name: conversions
+        description: "Conversions, possibly fractional (additive)."
+      - name: conversions_value
+        description: "Conversion value in account currency (additive)."
+
+  - name: fct_google_ads__audience_daily
+    description: "Audience target performance by day, device and network, with a level column."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - audience_target_key
+            - date_day
+            - device
+            - ad_network_type
+    columns:
+      - name: audience_target_key
+        description: "Surrogate key for the audience target: level, customer, campaign or ad group and criterion id."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__audience_target')
+              field: audience_target_key
+              config:
+                severity: warn
+      - name: level
+        description: "ad_group or campaign: the level the audience target is attached to."
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+      - name: campaign_id
+        description: "Google Ads campaign id."
+      - name: ad_group_id
+        description: "Google Ads ad group id."
+      - name: criterion_id
+        description: "Criterion id of the target. Repeats across ad groups."
+      - name: date_day
+        description: "Calendar day (segments.date) in the account time zone."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__date')
+              field: date_day
+              config:
+                severity: warn
+      - name: device
+        description: "Device segment (MOBILE, DESKTOP, TABLET, ...)."
+        tests:
+          - not_null
+      - name: ad_network_type
+        description: "Ad network type segment (SEARCH, CONTENT, YOUTUBE_WATCH, ...)."
+        tests:
+          - not_null
+      - name: impressions
+        description: "Impressions (additive)."
+      - name: clicks
+        description: "Clicks (additive)."
+      - name: interactions
+        description: "Interactions (additive)."
+      - name: cost
+        description: "Cost in account currency (additive). Converted from micros."
+      - name: conversions
+        description: "Conversions, possibly fractional (additive)."
+      - name: conversions_value
+        description: "Conversion value in account currency (additive)."
+      - name: view_through_conversions
+        description: "View-through conversions (additive)."
+
+  - name: fct_google_ads__audience_conversion_daily
+    description: "Audience target conversions split by conversion action."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - audience_target_key
+            - date_day
+            - conversion_action_key
+            - device
+            - ad_network_type
+    columns:
+      - name: audience_target_key
+        description: "Surrogate key for the audience target: level, customer, campaign or ad group and criterion id."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__audience_target')
+              field: audience_target_key
+              config:
+                severity: warn
+      - name: conversion_action_key
+        description: "Surrogate key for the conversion action (customer_id, conversion action resource name)."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__conversion_action')
+              field: conversion_action_key
+              config:
+                severity: warn
+      - name: level
+        description: "ad_group or campaign: the level the audience target is attached to."
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+      - name: campaign_id
+        description: "Google Ads campaign id."
+      - name: ad_group_id
+        description: "Google Ads ad group id."
+      - name: criterion_id
+        description: "Criterion id of the target. Repeats across ad groups."
+      - name: date_day
+        description: "Calendar day (segments.date) in the account time zone."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__date')
+              field: date_day
+              config:
+                severity: warn
+      - name: conversion_action
+        description: "Conversion action resource name (customers/<id>/conversionActions/<id>)."
+      - name: device
+        description: "Device segment (MOBILE, DESKTOP, TABLET, ...)."
+        tests:
+          - not_null
+      - name: ad_network_type
+        description: "Ad network type segment (SEARCH, CONTENT, YOUTUBE_WATCH, ...)."
+        tests:
+          - not_null
+      - name: conversions
+        description: "Conversions, possibly fractional (additive)."
+      - name: conversions_value
+        description: "Conversion value in account currency (additive)."
+
+  - name: fct_google_ads__placement_daily
+    description: "Placement performance by day, device and network."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - placement_key
+            - date_day
+            - device
+            - ad_network_type
+    columns:
+      - name: placement_key
+        description: "Surrogate key for the placement: customer, ad group and criterion id."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__placement')
+              field: placement_key
+              config:
+                severity: warn
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+      - name: campaign_id
+        description: "Google Ads campaign id."
+      - name: ad_group_id
+        description: "Google Ads ad group id."
+      - name: criterion_id
+        description: "Criterion id of the target. Repeats across ad groups."
+      - name: date_day
+        description: "Calendar day (segments.date) in the account time zone."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__date')
+              field: date_day
+              config:
+                severity: warn
+      - name: device
+        description: "Device segment (MOBILE, DESKTOP, TABLET, ...)."
+        tests:
+          - not_null
+      - name: ad_network_type
+        description: "Ad network type segment (SEARCH, CONTENT, YOUTUBE_WATCH, ...)."
+        tests:
+          - not_null
+      - name: impressions
+        description: "Impressions (additive)."
+      - name: clicks
+        description: "Clicks (additive)."
+      - name: interactions
+        description: "Interactions (additive)."
+      - name: cost
+        description: "Cost in account currency (additive). Converted from micros."
+      - name: conversions
+        description: "Conversions, possibly fractional (additive)."
+      - name: conversions_value
+        description: "Conversion value in account currency (additive)."
+      - name: view_through_conversions
+        description: "View-through conversions (additive)."
+
+  - name: fct_google_ads__placement_conversion_daily
+    description: "Placement conversions split by conversion action."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - placement_key
+            - date_day
+            - conversion_action_key
+            - click_type
+            - device
+            - ad_network_type
+    columns:
+      - name: placement_key
+        description: "Surrogate key for the placement: customer, ad group and criterion id."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__placement')
+              field: placement_key
+              config:
+                severity: warn
+      - name: conversion_action_key
+        description: "Surrogate key for the conversion action (customer_id, conversion action resource name)."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__conversion_action')
+              field: conversion_action_key
+              config:
+                severity: warn
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+      - name: campaign_id
+        description: "Google Ads campaign id."
+      - name: ad_group_id
+        description: "Google Ads ad group id."
+      - name: criterion_id
+        description: "Criterion id of the target. Repeats across ad groups."
+      - name: date_day
+        description: "Calendar day (segments.date) in the account time zone."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__date')
+              field: date_day
+              config:
+                severity: warn
+      - name: conversion_action
+        description: "Conversion action resource name (customers/<id>/conversionActions/<id>)."
+      - name: click_type
+        description: "Click type segment."
+        tests:
+          - not_null
+      - name: device
+        description: "Device segment (MOBILE, DESKTOP, TABLET, ...)."
+        tests:
+          - not_null
+      - name: ad_network_type
+        description: "Ad network type segment (SEARCH, CONTENT, YOUTUBE_WATCH, ...)."
+        tests:
+          - not_null
+      - name: conversions
+        description: "Conversions, possibly fractional (additive)."
+      - name: conversions_value
+        description: "Conversion value in account currency (additive)."
+
+  - name: fct_google_ads__video_daily
+    description: "Video performance by day, device and network: basic stats and non-click stats combined at their shared grain."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - video_key
+            - ad_id
+            - video_channel_id
+            - date_day
+            - device
+            - ad_network_type
+    columns:
+      - name: video_key
+        description: "Surrogate key for the video: customer, ad group and video id."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__video')
+              field: video_key
+              config:
+                severity: warn
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+      - name: campaign_id
+        description: "Google Ads campaign id."
+      - name: ad_group_id
+        description: "Google Ads ad group id."
+      - name: ad_id
+        description: "Google Ads ad id. Repeats across ad groups; use ad_key for a unique key."
+        tests:
+          - not_null
+      - name: video_id
+        description: "YouTube video id."
+      - name: video_channel_id
+        description: "YouTube channel id of the video."
+        tests:
+          - not_null
+      - name: date_day
+        description: "Calendar day (segments.date) in the account time zone."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__date')
+              field: date_day
+              config:
+                severity: warn
+      - name: device
+        description: "Device segment (MOBILE, DESKTOP, TABLET, ...)."
+        tests:
+          - not_null
+      - name: ad_network_type
+        description: "Ad network type segment (SEARCH, CONTENT, YOUTUBE_WATCH, ...)."
+        tests:
+          - not_null
+      - name: impressions
+        description: "Impressions (additive)."
+      - name: clicks
+        description: "Clicks (additive)."
+      - name: cost
+        description: "Cost in account currency (additive). Converted from micros."
+      - name: conversions
+        description: "Conversions, possibly fractional (additive)."
+      - name: conversions_value
+        description: "Conversion value in account currency (additive)."
+      - name: view_through_conversions
+        description: "View-through conversions (additive)."
+      - name: all_conversions
+        description: "All conversions including cross-device and non-primary actions (additive)."
+      - name: all_conversions_value
+        description: "All conversions value (additive)."
+      - name: cross_device_conversions
+        description: "Cross-device conversions (additive)."
+      - name: engagements
+        description: "Engagements (additive)."
+      - name: video_trueview_views
+        description: "TrueView views (additive)."
+
+  - name: fct_google_ads__geo_daily
+    description: "Geographic performance by campaign, ad group, location, day, device and network."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - campaign_id
+            - ad_group_id
+            - geographic_view_country_criterion_id
+            - location_type
+            - geo_target_most_specific_location
+            - date_day
+            - device
+            - ad_network_type
+    columns:
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+        tests:
+          - not_null
+      - name: campaign_id
+        description: "Google Ads campaign id."
+        tests:
+          - not_null
+      - name: ad_group_id
+        description: "Google Ads ad group id."
+        tests:
+          - not_null
+      - name: geographic_view_country_criterion_id
+        description: "Country criterion id of the geographic view."
+        tests:
+          - not_null
+      - name: geo_target_id
+        description: "Geo target constant id parsed from the location resource name. Join to the google_ads_geo_target_lookup seed for a name."
+      - name: location_type
+        description: "LOCATION_OF_PRESENCE or AREA_OF_INTEREST."
+        tests:
+          - not_null
+      - name: geo_target_most_specific_location
+        description: "Most specific location, as a geo target constant resource name."
+        tests:
+          - not_null
+      - name: date_day
+        description: "Calendar day (segments.date) in the account time zone."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__date')
+              field: date_day
+              config:
+                severity: warn
+      - name: device
+        description: "Device segment (MOBILE, DESKTOP, TABLET, ...)."
+        tests:
+          - not_null
+      - name: ad_network_type
+        description: "Ad network type segment (SEARCH, CONTENT, YOUTUBE_WATCH, ...)."
+        tests:
+          - not_null
+      - name: impressions
+        description: "Impressions (additive)."
+      - name: clicks
+        description: "Clicks (additive)."
+      - name: interactions
+        description: "Interactions (additive)."
+      - name: cost
+        description: "Cost in account currency (additive). Converted from micros."
+      - name: conversions
+        description: "Conversions, possibly fractional (additive)."
+      - name: conversions_value
+        description: "Conversion value in account currency (additive)."
+      - name: view_through_conversions
+        description: "View-through conversions (additive)."
+      - name: all_conversions
+        description: "All conversions including cross-device and non-primary actions (additive)."
+      - name: all_conversions_value
+        description: "All conversions value (additive)."
+
+  - name: fct_google_ads__geo_conversion_daily
+    description: "Geographic conversions split by conversion action."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - campaign_id
+            - ad_group_id
+            - geographic_view_country_criterion_id
+            - location_type
+            - geo_target_most_specific_location
+            - date_day
+            - conversion_action_key
+            - device
+            - ad_network_type
+    columns:
+      - name: conversion_action_key
+        description: "Surrogate key for the conversion action (customer_id, conversion action resource name)."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__conversion_action')
+              field: conversion_action_key
+              config:
+                severity: warn
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+        tests:
+          - not_null
+      - name: campaign_id
+        description: "Google Ads campaign id."
+        tests:
+          - not_null
+      - name: ad_group_id
+        description: "Google Ads ad group id."
+        tests:
+          - not_null
+      - name: geographic_view_country_criterion_id
+        description: "Country criterion id of the geographic view."
+        tests:
+          - not_null
+      - name: geo_target_id
+        description: "Geo target constant id parsed from the location resource name. Join to the google_ads_geo_target_lookup seed for a name."
+      - name: location_type
+        description: "LOCATION_OF_PRESENCE or AREA_OF_INTEREST."
+        tests:
+          - not_null
+      - name: geo_target_most_specific_location
+        description: "Most specific location, as a geo target constant resource name."
+        tests:
+          - not_null
+      - name: date_day
+        description: "Calendar day (segments.date) in the account time zone."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__date')
+              field: date_day
+              config:
+                severity: warn
+      - name: conversion_action
+        description: "Conversion action resource name (customers/<id>/conversionActions/<id>)."
+      - name: device
+        description: "Device segment (MOBILE, DESKTOP, TABLET, ...)."
+        tests:
+          - not_null
+      - name: ad_network_type
+        description: "Ad network type segment (SEARCH, CONTENT, YOUTUBE_WATCH, ...)."
+        tests:
+          - not_null
+      - name: conversions
+        description: "Conversions, possibly fractional (additive)."
+      - name: conversions_value
+        description: "Conversion value in account currency (additive)."
+      - name: all_conversions
+        description: "All conversions including cross-device and non-primary actions (additive)."
+      - name: all_conversions_value
+        description: "All conversions value (additive)."
+
+  - name: fct_google_ads__shopping_product_daily
+    description: "Shopping performance by campaign, ad group, item, merchant, day, device and network, with brand and category levels 1 to 3."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - campaign_id
+            - ad_group_id
+            - product_item_id
+            - product_merchant_id
+            - date_day
+            - device
+            - ad_network_type
+    columns:
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+        tests:
+          - not_null
+      - name: campaign_id
+        description: "Google Ads campaign id."
+        tests:
+          - not_null
+      - name: ad_group_id
+        description: "Google Ads ad group id."
+        tests:
+          - not_null
+      - name: product_item_id
+        description: "Merchant item id (offer id) of the product."
+        tests:
+          - not_null
+      - name: product_merchant_id
+        description: "Merchant Center id."
+        tests:
+          - not_null
+      - name: date_day
+        description: "Calendar day (segments.date) in the account time zone."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__date')
+              field: date_day
+              config:
+                severity: warn
+      - name: device
+        description: "Device segment (MOBILE, DESKTOP, TABLET, ...)."
+        tests:
+          - not_null
+      - name: ad_network_type
+        description: "Ad network type segment (SEARCH, CONTENT, YOUTUBE_WATCH, ...)."
+        tests:
+          - not_null
+      - name: product_brand
+        description: "Product brand."
+      - name: product_category_level1
+        description: "Product category, level 1."
+      - name: product_category_level2
+        description: "Product category, level 2."
+      - name: product_category_level3
+        description: "Product category, level 3."
+      - name: impressions
+        description: "Impressions (additive)."
+      - name: clicks
+        description: "Clicks (additive)."
+      - name: cost
+        description: "Cost in account currency (additive). Converted from micros."
+      - name: conversions
+        description: "Conversions, possibly fractional (additive)."
+      - name: conversions_value
+        description: "Conversion value in account currency (additive)."
+      - name: all_conversions
+        description: "All conversions including cross-device and non-primary actions (additive)."
+      - name: all_conversions_value
+        description: "All conversions value (additive)."
+
+  - name: fct_google_ads__shopping_product_conversion_daily
+    description: "Shopping conversions by conversion action, item and merchant."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - campaign_id
+            - ad_group_id
+            - product_item_id
+            - product_merchant_id
+            - date_day
+            - conversion_action_key
+            - click_type
+            - device
+            - ad_network_type
+    columns:
+      - name: conversion_action_key
+        description: "Surrogate key for the conversion action (customer_id, conversion action resource name)."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__conversion_action')
+              field: conversion_action_key
+              config:
+                severity: warn
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+        tests:
+          - not_null
+      - name: campaign_id
+        description: "Google Ads campaign id."
+        tests:
+          - not_null
+      - name: ad_group_id
+        description: "Google Ads ad group id."
+        tests:
+          - not_null
+      - name: product_item_id
+        description: "Merchant item id (offer id) of the product."
+        tests:
+          - not_null
+      - name: product_merchant_id
+        description: "Merchant Center id."
+        tests:
+          - not_null
+      - name: date_day
+        description: "Calendar day (segments.date) in the account time zone."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__date')
+              field: date_day
+              config:
+                severity: warn
+      - name: conversion_action
+        description: "Conversion action resource name (customers/<id>/conversionActions/<id>)."
+      - name: click_type
+        description: "Click type segment."
+        tests:
+          - not_null
+      - name: device
+        description: "Device segment (MOBILE, DESKTOP, TABLET, ...)."
+        tests:
+          - not_null
+      - name: ad_network_type
+        description: "Ad network type segment (SEARCH, CONTENT, YOUTUBE_WATCH, ...)."
+        tests:
+          - not_null
+      - name: product_brand
+        description: "Product brand."
+      - name: product_category_level1
+        description: "Product category, level 1."
+      - name: product_category_level2
+        description: "Product category, level 2."
+      - name: product_category_level3
+        description: "Product category, level 3."
+      - name: conversions_value
+        description: "Conversion value in account currency (additive)."
+      - name: all_conversions
+        description: "All conversions including cross-device and non-primary actions (additive)."
+      - name: all_conversions_value
+        description: "All conversions value (additive)."
+
+  - name: fct_google_ads__campaign_asset_daily
+    description: "Campaign asset performance (Performance Max asset detail) by asset, field type and source."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - campaign_id
+            - asset_id
+            - asset_field_type
+            - asset_source
+            - date_day
+            - device
+            - ad_network_type
+    columns:
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+        tests:
+          - not_null
+      - name: campaign_id
+        description: "Google Ads campaign id."
+        tests:
+          - not_null
+      - name: asset_id
+        description: "Asset id (parsed from a resource name where needed)."
+        tests:
+          - not_null
+      - name: asset_field_type
+        description: "Role of the asset in the campaign."
+        tests:
+          - not_null
+      - name: asset_source
+        description: "Source of the asset."
+        tests:
+          - not_null
+      - name: date_day
+        description: "Calendar day (segments.date) in the account time zone."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__date')
+              field: date_day
+              config:
+                severity: warn
+      - name: device
+        description: "Device segment (MOBILE, DESKTOP, TABLET, ...)."
+        tests:
+          - not_null
+      - name: ad_network_type
+        description: "Ad network type segment (SEARCH, CONTENT, YOUTUBE_WATCH, ...)."
+        tests:
+          - not_null
+      - name: impressions
+        description: "Impressions (additive)."
+      - name: clicks
+        description: "Clicks (additive)."
+      - name: interactions
+        description: "Interactions (additive)."
+      - name: cost
+        description: "Cost in account currency (additive). Converted from micros."
+      - name: conversions
+        description: "Conversions, possibly fractional (additive)."
+      - name: conversions_value
+        description: "Conversion value in account currency (additive)."
+
+  - name: fct_google_ads__bidding_strategy_daily
+    description: "Portfolio bidding strategy performance by day and device."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - bidding_strategy_key
+            - date_day
+            - device
+    columns:
+      - name: bidding_strategy_key
+        description: "Surrogate key for the portfolio bidding strategy."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__bidding_strategy')
+              field: bidding_strategy_key
+              config:
+                severity: warn
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+      - name: bidding_strategy_id
+        description: "Portfolio bidding strategy id."
+      - name: date_day
+        description: "Calendar day (segments.date) in the account time zone."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__date')
+              field: date_day
+              config:
+                severity: warn
+      - name: device
+        description: "Device segment (MOBILE, DESKTOP, TABLET, ...)."
+        tests:
+          - not_null
+      - name: impressions
+        description: "Impressions (additive)."
+      - name: clicks
+        description: "Clicks (additive)."
+      - name: cost
+        description: "Cost in account currency (additive). Converted from micros."
+      - name: conversions
+        description: "Conversions, possibly fractional (additive)."
+      - name: conversions_value
+        description: "Conversion value in account currency (additive)."
+
+  - name: fct_google_ads__budget_daily
+    description: "Daily spend per campaign budget. Pair with budget_amount on dim_google_ads__campaign for pacing."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - campaign_budget_id
+            - campaign_id
+            - date_day
+    columns:
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+        tests:
+          - not_null
+      - name: campaign_budget_id
+        description: "Budget id."
+        tests:
+          - not_null
+      - name: campaign_id
+        description: "Google Ads campaign id."
+        tests:
+          - not_null
+      - name: date_day
+        description: "Calendar day (segments.date) in the account time zone."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__date')
+              field: date_day
+              config:
+                severity: warn
+      - name: impressions
+        description: "Impressions (additive)."
+      - name: clicks
+        description: "Clicks (additive)."
+      - name: interactions
+        description: "Interactions (additive)."
+      - name: cost
+        description: "Cost in account currency (additive). Converted from micros."
+      - name: conversions
+        description: "Conversions, possibly fractional (additive)."
+      - name: conversions_value
+        description: "Conversion value in account currency (additive)."
+      - name: all_conversions
+        description: "All conversions including cross-device and non-primary actions (additive)."
+      - name: all_conversions_value
+        description: "All conversions value (additive)."
+      - name: view_through_conversions
+        description: "View-through conversions (additive)."
+
+  - name: fct_google_ads__campaign_hourly
+    description: "Campaign performance by hour of day, device, network and click type."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - campaign_id
+            - date_day
+            - hour
+            - device
+            - ad_network_type
+            - click_type
+    columns:
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+        tests:
+          - not_null
+      - name: campaign_id
+        description: "Google Ads campaign id."
+        tests:
+          - not_null
+      - name: date_day
+        description: "Calendar day (segments.date) in the account time zone."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__date')
+              field: date_day
+              config:
+                severity: warn
+      - name: hour
+        description: "Hour of day (0-23) in the account time zone."
+        tests:
+          - not_null
+      - name: device
+        description: "Device segment (MOBILE, DESKTOP, TABLET, ...)."
+        tests:
+          - not_null
+      - name: ad_network_type
+        description: "Ad network type segment (SEARCH, CONTENT, YOUTUBE_WATCH, ...)."
+        tests:
+          - not_null
+      - name: click_type
+        description: "Click type segment."
+        tests:
+          - not_null
+      - name: impressions
+        description: "Impressions (additive)."
+      - name: clicks
+        description: "Clicks (additive)."
+      - name: interactions
+        description: "Interactions (additive)."
+      - name: cost
+        description: "Cost in account currency (additive). Converted from micros."
+      - name: conversions
+        description: "Conversions, possibly fractional (additive)."
+      - name: conversions_value
+        description: "Conversion value in account currency (additive)."
+
+  - name: fct_google_ads__campaign_conversion_hourly
+    description: "Campaign conversions by hour and conversion action."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - campaign_id
+            - date_day
+            - hour
+            - conversion_action_key
+            - device
+            - ad_network_type
+            - click_type
+    columns:
+      - name: conversion_action_key
+        description: "Surrogate key for the conversion action (customer_id, conversion action resource name)."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__conversion_action')
+              field: conversion_action_key
+              config:
+                severity: warn
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+        tests:
+          - not_null
+      - name: campaign_id
+        description: "Google Ads campaign id."
+        tests:
+          - not_null
+      - name: date_day
+        description: "Calendar day (segments.date) in the account time zone."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__date')
+              field: date_day
+              config:
+                severity: warn
+      - name: hour
+        description: "Hour of day (0-23) in the account time zone."
+        tests:
+          - not_null
+      - name: conversion_action
+        description: "Conversion action resource name (customers/<id>/conversionActions/<id>)."
+      - name: device
+        description: "Device segment (MOBILE, DESKTOP, TABLET, ...)."
+        tests:
+          - not_null
+      - name: ad_network_type
+        description: "Ad network type segment (SEARCH, CONTENT, YOUTUBE_WATCH, ...)."
+        tests:
+          - not_null
+      - name: click_type
+        description: "Click type segment."
+        tests:
+          - not_null
+      - name: conversions
+        description: "Conversions, possibly fractional (additive)."
+      - name: conversions_value
+        description: "Conversion value in account currency (additive)."
+
+  - name: fct_google_ads__account_impression_share_daily
+    description: "Account impression share and lost impression share by day and network. The only fact with ratio columns: they are passed through at source grain and must never be summed or averaged across rows."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - date_day
+            - ad_network_type
+    columns:
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+        tests:
+          - not_null
+      - name: date_day
+        description: "Calendar day (segments.date) in the account time zone."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_google_ads__date')
+              field: date_day
+              config:
+                severity: warn
+      - name: ad_network_type
+        description: "Ad network type segment (SEARCH, CONTENT, YOUTUBE_WATCH, ...)."
+        tests:
+          - not_null
+      - name: search_impression_share
+        description: "Search impression share, a ratio reported by Google Ads. Never sum or average across rows."
+      - name: search_exact_match_impression_share
+        description: "Search exact match impression share (ratio; never sum)."
+      - name: search_budget_lost_impression_share
+        description: "Search impression share lost to budget (ratio; never sum)."
+      - name: search_rank_lost_impression_share
+        description: "Search impression share lost to rank (ratio; never sum)."
+      - name: content_impression_share
+        description: "Display (content) impression share (ratio; never sum)."
+      - name: content_budget_lost_impression_share
+        description: "Display impression share lost to budget (ratio; never sum)."
+      - name: content_rank_lost_impression_share
+        description: "Display impression share lost to rank (ratio; never sum)."
+      - name: all_conversions
+        description: "All conversions including cross-device and non-primary actions (additive)."
+      - name: all_conversions_value
+        description: "All conversions value (additive)."
+      - name: cross_device_conversions
+        description: "Cross-device conversions (additive)."
+      - name: engagements
+        description: "Engagements (additive)."
+      - name: invalid_clicks
+        description: "Invalid clicks (additive)."
+      - name: video_trueview_views
+        description: "TrueView views (additive)."
+

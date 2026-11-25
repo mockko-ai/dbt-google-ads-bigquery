@@ -1,0 +1,9 @@
+ad_group_id,label_id,ad_group_ad_label_ad_group_ad,ad_group_ad_label_label,ad_group_ad_label_resource_name,ad_group_name,label_name,label_resource_name,_LATEST_DATE,_DATA_DATE
+1001,801,customers/1234567890/adGroupAds/1001~5001,,,,Priority (old),,2025-01-28,2025-01-27
+1002,801,customers/1234567890/adGroupAds/1002~5001,,,,Priority (old),,2025-01-28,2025-01-27
+1003,802,customers/1234567890/adGroupAds/1003~5001,,,,Test (old),,2025-01-28,2025-01-27
+1004,802,customers/1234567890/adGroupAds/1004~5001,,,,Test (old),,2025-01-28,2025-01-27
+1001,801,customers/1234567890/adGroupAds/1001~5001,,,,Priority,,2025-01-28,2025-01-28
+1002,801,customers/1234567890/adGroupAds/1002~5001,,,,Priority,,2025-01-28,2025-01-28
+1003,802,customers/1234567890/adGroupAds/1003~5001,,,,Test,,2025-01-28,2025-01-28
+1004,802,customers/1234567890/adGroupAds/1004~5001,,,,Test,,2025-01-28,2025-01-28

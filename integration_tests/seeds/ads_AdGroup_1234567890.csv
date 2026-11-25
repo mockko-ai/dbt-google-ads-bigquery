@@ -1,0 +1,9 @@
+ad_group_id,campaign_id,customer_id,ad_group_ad_rotation_mode,ad_group_cpc_bid_micros,ad_group_cpm_bid_micros,ad_group_cpv_bid_micros,ad_group_display_custom_bid_dimension,ad_group_effective_target_cpa_micros,ad_group_effective_target_cpa_source,ad_group_effective_target_roas,ad_group_effective_target_roas_source,ad_group_name,ad_group_status,ad_group_tracking_url_template,ad_group_type,ad_group_url_custom_parameters,campaign_bidding_strategy,campaign_bidding_strategy_type,campaign_manual_cpc_enhanced_cpc_enabled,campaign_percent_cpc_enhanced_cpc_enabled,_LATEST_DATE,_DATA_DATE
+1001,101,1234567890,,1000000,,,,,,,,Brand exact (old),ENABLED,,SEARCH_STANDARD,,,,,,2025-01-28,2025-01-27
+1002,101,1234567890,,1000000,,,,,,,,Brand phrase (old),ENABLED,,SEARCH_STANDARD,,,,,,2025-01-28,2025-01-27
+1003,102,1234567890,,1000000,,,,,,,,Generic broad (old),ENABLED,,SEARCH_STANDARD,,,,,,2025-01-28,2025-01-27
+1004,102,1234567890,,1000000,,,,,,,,Generic phrase (old),ENABLED,,SEARCH_STANDARD,,,,,,2025-01-28,2025-01-27
+1001,101,1234567890,,1000000,,,,,,,,Brand exact,ENABLED,,SEARCH_STANDARD,,,,,,2025-01-28,2025-01-28
+1002,101,1234567890,,1000000,,,,,,,,Brand phrase,ENABLED,,SEARCH_STANDARD,,,,,,2025-01-28,2025-01-28
+1003,102,1234567890,,1000000,,,,,,,,Generic broad,ENABLED,,SEARCH_STANDARD,,,,,,2025-01-28,2025-01-28
+1004,102,1234567890,,1000000,,,,,,,,Generic phrase,ENABLED,,SEARCH_STANDARD,,,,,,2025-01-28,2025-01-28
