@@ -1,0 +1,5 @@
+campaign_id,label_id,campaign_label_campaign,campaign_label_label,campaign_label_resource_name,campaign_name,label_name,label_resource_name,_LATEST_DATE,_DATA_DATE
+101,801,,,,Brand search,Priority (old),,2025-01-28,2025-01-27
+102,802,,,,Generic search,Test (old),,2025-01-28,2025-01-27
+101,801,,,,Brand search,Priority,,2025-01-28,2025-01-28
+102,802,,,,Generic search,Test,,2025-01-28,2025-01-28

@@ -1,0 +1,36 @@
+name: google_ads_bigquery_integration_tests
+version: 0.1.0
+config-version: 2
+require-dbt-version: [">=1.6.0", "<3.0.0"]
+profile: google_ads_bigquery_integration_tests
+
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  # The seeds are loaded into the target dataset and read from there.
+  google_ads_schema: "{{ env_var('GOOGLE_ADS_DBT_DATASET', 'dbt_ci') }}"
+  google_ads_customer_ids: ["1234567890"]
+  google_ads_lookback_days: 7
+  # Core families on ...
+  google_ads__using_account: true
+  google_ads__using_campaign: true
+  google_ads__using_ad_group: true
+  google_ads__using_ad: true
+  google_ads__using_keyword: true
+  google_ads__using_conversions: true
+  google_ads__using_search_terms: true
+  google_ads__using_reporting: true
+  # ... optional families off: their source tables are not seeded.
+  google_ads__using_demographics: false
+  google_ads__using_audiences: false
+  google_ads__using_placements: false
+  google_ads__using_video: false
+  google_ads__using_geo: false
+  google_ads__using_shopping: false
+  google_ads__using_pmax: false
+  google_ads__using_bidding_budget: false
+  google_ads__using_hourly: false
+  google_ads__using_impression_share: false
+  google_ads__using_criteria: false

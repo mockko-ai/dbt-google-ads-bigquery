@@ -1,0 +1,3 @@
+customer_id,customer_auto_tagging_enabled,customer_currency_code,customer_descriptive_name,customer_manager,customer_test_account,customer_time_zone,_LATEST_DATE,_DATA_DATE
+1234567890,true,USD,Example account (old),false,true,America/New_York,2025-01-28,2025-01-27
+1234567890,true,USD,Example account,false,true,America/New_York,2025-01-28,2025-01-28

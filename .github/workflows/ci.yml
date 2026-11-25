@@ -1,0 +1,122 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  parse:
+    name: dbt parse (dbt-bigquery ${{ matrix.dbt-bigquery }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        dbt-bigquery: ["latest", "1.8.*"]
+    env:
+      DBT_PROFILES_DIR: ${{ github.workspace }}/ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dbt-bigquery
+        run: |
+          if [ "${{ matrix.dbt-bigquery }}" = "latest" ]; then
+            pip install dbt-bigquery
+          else
+            pip install "dbt-bigquery==${{ matrix.dbt-bigquery }}"
+          fi
+          dbt --version
+      - name: Package - deps
+        run: dbt deps
+      - name: Package - parse (defaults)
+        run: |
+          dbt parse --no-partial-parse --vars '{google_ads_customer_ids: ["1234567890"]}'
+      - name: Package - parse (several customers)
+        run: |
+          dbt parse --no-partial-parse --vars '{google_ads_customer_ids: ["1234567890", "1234567891"]}'
+      - name: Package - parse (every optional family on)
+        run: |
+          dbt parse --no-partial-parse --vars '{
+            google_ads_customer_ids: ["1234567890"],
+            google_ads__using_demographics: true, google_ads__using_audiences: true,
+            google_ads__using_placements: true, google_ads__using_video: true,
+            google_ads__using_geo: true, google_ads__using_shopping: true,
+            google_ads__using_pmax: true, google_ads__using_bidding_budget: true,
+            google_ads__using_hourly: true, google_ads__using_impression_share: true,
+            google_ads__using_criteria: true}'
+      - name: Package - parse (every core family off)
+        run: |
+          dbt parse --no-partial-parse --vars '{
+            google_ads_customer_ids: ["1234567890"],
+            google_ads__using_account: false, google_ads__using_campaign: false,
+            google_ads__using_ad_group: false, google_ads__using_ad: false,
+            google_ads__using_keyword: false, google_ads__using_conversions: false,
+            google_ads__using_search_terms: false, google_ads__using_reporting: false}'
+      - name: Integration tests - deps
+        working-directory: integration_tests
+        run: dbt deps
+      - name: Integration tests - parse
+        working-directory: integration_tests
+        run: dbt parse --no-partial-parse
+
+  scripts:
+    name: generated files are current
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install openpyxl
+      - run: python scripts/generate_seeds.py
+      - run: python scripts/generate_model_catalog.py
+      - name: Fail if regenerating changed anything
+        run: git diff --exit-code -- integration_tests/seeds docs
+
+  build:
+    name: dbt build (only with credentials)
+    needs: parse
+    runs-on: ubuntu-latest
+    env:
+      DBT_PROFILES_DIR: ${{ github.workspace }}/ci
+      GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+      GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+    steps:
+      - name: Check for credentials
+        id: creds
+        run: |
+          if [ -n "$GCP_SA_KEY" ] && [ -n "$GCP_PROJECT" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "No GCP_SA_KEY / GCP_PROJECT secrets: skipping dbt build."
+          fi
+      - uses: actions/checkout@v4
+        if: steps.creds.outputs.present == 'true'
+      - uses: actions/setup-python@v5
+        if: steps.creds.outputs.present == 'true'
+        with:
+          python-version: "3.11"
+      - name: Install dbt-bigquery
+        if: steps.creds.outputs.present == 'true'
+        run: pip install dbt-bigquery
+      - name: Build integration tests
+        if: steps.creds.outputs.present == 'true'
+        working-directory: integration_tests
+        env:
+          GOOGLE_ADS_DBT_AUTH_METHOD: service-account
+          GOOGLE_ADS_DBT_PROJECT: ${{ secrets.GCP_PROJECT }}
+          GOOGLE_ADS_DBT_DATASET: dbt_ci_${{ github.run_id }}
+        run: |
+          printf '%s' "$GCP_SA_KEY" > "$RUNNER_TEMP/key.json"
+          export GOOGLE_ADS_DBT_KEYFILE="$RUNNER_TEMP/key.json"
+          dbt deps
+          dbt seed
+          dbt build
+      - name: Drop the CI dataset
+        if: always() && steps.creds.outputs.present == 'true'
+        run: |
+          gcloud auth activate-service-account --key-file="$RUNNER_TEMP/key.json" || true
+          bq --project_id="${{ secrets.GCP_PROJECT }}" rm -r -f -d "dbt_ci_${{ github.run_id }}" || true

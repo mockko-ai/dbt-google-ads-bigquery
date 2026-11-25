@@ -1,0 +1,67 @@
+name: google_ads_bigquery
+version: 0.1.0
+config-version: 2
+require-dbt-version: [">=1.6.0", "<3.0.0"]
+
+# Only used when you run the package on its own (CI, local development).
+# When installed as a dependency, your own project's profile is used.
+profile: google_ads_bigquery
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+analysis-paths: ["analyses"]
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  google_ads_bigquery:
+    # --- Source -----------------------------------------------------------
+    # google_ads_database: defaults to target.database
+    google_ads_schema: google_ads
+    # google_ads_customer_ids: ["1234567890"]   # REQUIRED, set in your project
+    # --- Behaviour --------------------------------------------------------
+    google_ads_lookback_days: 7
+    google_ads_anomaly_zscore: 3
+    google_ads_date_spine_start: "2018-01-01"
+    # --- Feature flags: core families (on by default) ----------------------
+    google_ads__using_account: true
+    google_ads__using_campaign: true
+    google_ads__using_ad_group: true
+    google_ads__using_ad: true
+    google_ads__using_keyword: true
+    google_ads__using_conversions: true
+    google_ads__using_search_terms: true
+    google_ads__using_reporting: true
+    # --- Feature flags: optional families (off by default) -----------------
+    google_ads__using_demographics: false
+    google_ads__using_audiences: false
+    google_ads__using_placements: false
+    google_ads__using_video: false
+    google_ads__using_geo: false
+    google_ads__using_shopping: false
+    google_ads__using_pmax: false
+    google_ads__using_bidding_budget: false
+    google_ads__using_hourly: false
+    google_ads__using_impression_share: false
+    google_ads__using_criteria: false
+
+models:
+  google_ads_bigquery:
+    staging:
+      +materialized: view
+    intermediate:
+      +materialized: ephemeral
+    marts:
+      core:
+        +materialized: table
+      reporting:
+        +materialized: table
+
+seeds:
+  google_ads_bigquery:
+    # Example lookup for geo target names. Replace it with Google's full geo targets
+    # list (https://developers.google.com/google-ads/api/data/geotargets) if you need names.
+    google_ads_geo_target_lookup:
+      +enabled: "{{ var('google_ads__using_geo', false) }}"
+      +column_types:
+        geo_target_id: int64

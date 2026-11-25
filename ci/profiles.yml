@@ -1,0 +1,25 @@
+# Dummy profile for `dbt deps` / `dbt parse` in CI. Reads everything from environment
+# variables; no secrets are stored here.
+google_ads_bigquery:
+  target: ci
+  outputs:
+    ci:
+      type: bigquery
+      method: "{{ env_var('GOOGLE_ADS_DBT_AUTH_METHOD', 'oauth') }}"
+      project: "{{ env_var('GOOGLE_ADS_DBT_PROJECT', 'dummy-project') }}"
+      dataset: "{{ env_var('GOOGLE_ADS_DBT_DATASET', 'dbt_ci') }}"
+      location: "{{ env_var('GOOGLE_ADS_DBT_LOCATION', 'US') }}"
+      keyfile: "{{ env_var('GOOGLE_ADS_DBT_KEYFILE', '') }}"
+      threads: 4
+
+google_ads_bigquery_integration_tests:
+  target: ci
+  outputs:
+    ci:
+      type: bigquery
+      method: "{{ env_var('GOOGLE_ADS_DBT_AUTH_METHOD', 'oauth') }}"
+      project: "{{ env_var('GOOGLE_ADS_DBT_PROJECT', 'dummy-project') }}"
+      dataset: "{{ env_var('GOOGLE_ADS_DBT_DATASET', 'dbt_ci') }}"
+      location: "{{ env_var('GOOGLE_ADS_DBT_LOCATION', 'US') }}"
+      keyfile: "{{ env_var('GOOGLE_ADS_DBT_KEYFILE', '') }}"
+      threads: 4

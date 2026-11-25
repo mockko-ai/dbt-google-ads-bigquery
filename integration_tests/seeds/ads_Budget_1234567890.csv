@@ -1,0 +1,5 @@
+campaign_budget_id,customer_id,campaign_budget_amount_micros,campaign_budget_delivery_method,campaign_budget_explicitly_shared,campaign_budget_has_recommended_budget,campaign_budget_name,campaign_budget_period,campaign_budget_recommended_budget_amount_micros,campaign_budget_reference_count,campaign_budget_status,campaign_budget_total_amount_micros,customer_descriptive_name,_LATEST_DATE,_DATA_DATE
+9001,1234567890,60000000,STANDARD,false,,Budget 9001 (old),DAILY,,,,,,2025-01-28,2025-01-27
+9002,1234567890,60000000,STANDARD,false,,Budget 9002 (old),DAILY,,,,,,2025-01-28,2025-01-27
+9001,1234567890,60000000,STANDARD,false,,Budget 9001,DAILY,,,,,,2025-01-28,2025-01-28
+9002,1234567890,60000000,STANDARD,false,,Budget 9002,DAILY,,,,,,2025-01-28,2025-01-28

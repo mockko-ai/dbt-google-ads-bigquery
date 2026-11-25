@@ -1,0 +1,170 @@
+version: 2
+
+models:
+  - name: agg_google_ads__account_weekly
+    description: >
+      Account performance by week (weeks start on Monday). Derived ratios (ctr, cpc, cpa, roas,
+      conversion_rate) use safe_divide on summed numerators and denominators. Each measure has the previous
+      week's value and the week-over-week change (absolute and percent).
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - week_start
+    columns:
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+        tests: [not_null]
+      - name: week_start
+        description: "Monday of the week."
+        tests: [not_null]
+      - name: week_end
+        description: "Sunday of the week."
+      - name: is_complete_week
+        description: "True when the whole week is in the past."
+      - name: days_with_data
+        description: "Number of days of the week with rows in the account fact."
+      - name: last_data_date
+        description: "Latest day of the week with data."
+      - name: cost
+        description: "Total cost for the week, in account currency."
+      - name: cpa
+        description: "Cost divided by conversions (null when there are no conversions)."
+      - name: roas
+        description: "Conversions value divided by cost."
+
+  - name: agg_google_ads__campaign_weekly
+    description: >
+      Campaign performance by week with week-over-week change, change against the trailing 4-week average
+      (the four calendar weeks before, over weeks that have data) and share of the customer's cost for the week.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - campaign_id
+            - week_start
+    columns:
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+        tests: [not_null]
+      - name: campaign_id
+        description: "Google Ads campaign id."
+        tests: [not_null]
+      - name: campaign_name
+        description: "Campaign name from the latest snapshot."
+      - name: week_start
+        description: "Monday of the week."
+        tests: [not_null]
+      - name: share_of_account_cost
+        description: "Campaign cost divided by the cost of all campaigns of the customer in the week."
+      - name: cost_vs_trailing_4w_pct
+        description: "Cost versus the trailing 4-week average cost, as a fraction (0.1 = 10 percent above)."
+
+  - name: agg_google_ads__conversion_action_weekly
+    description: >
+      Conversions by campaign, conversion action and week, with week-over-week change and the action's share of the
+      campaign's conversions. mix_shift_pp is the change in that share versus the previous week.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - campaign_id
+            - conversion_action_key
+            - week_start
+    columns:
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+        tests: [not_null]
+      - name: campaign_id
+        description: "Google Ads campaign id."
+        tests: [not_null]
+      - name: conversion_action_key
+        description: "Surrogate key of the conversion action."
+        tests: [not_null]
+      - name: week_start
+        description: "Monday of the week."
+        tests: [not_null]
+      - name: mix_shift_pp
+        description: "Share of campaign conversions this week minus last week (0.05 = 5 points)."
+
+  - name: agg_google_ads__search_term_weekly
+    description: >
+      Search terms by campaign and week, summed over ads, ad groups, matched keywords, devices and networks.
+      cost_rank and conversions_rank use a fixed sort; is_spend_without_conversions marks terms with cost and no conversions.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - campaign_id
+            - search_term
+            - week_start
+    columns:
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+        tests: [not_null]
+      - name: campaign_id
+        description: "Google Ads campaign id."
+        tests: [not_null]
+      - name: search_term
+        description: "Search term."
+        tests: [not_null]
+      - name: week_start
+        description: "Monday of the week."
+        tests: [not_null]
+      - name: is_spend_without_conversions
+        description: "True if the term cost money and had no conversions in the week."
+
+  - name: rpt_google_ads__anomalies
+    description: >
+      Campaign-day cost, conversions and CPA against the trailing 28 days. A metric is flagged when its z-score is beyond
+      var google_ads_anomaly_zscore (default 3). At least 7 trailing days with data are needed to score a day.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - campaign_id
+            - date_day
+    columns:
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+        tests: [not_null]
+      - name: campaign_id
+        description: "Google Ads campaign id."
+        tests: [not_null]
+      - name: date_day
+        description: "Day."
+        tests: [not_null]
+      - name: is_anomaly
+        description: "True if cost, conversions or CPA is beyond the z-score threshold."
+      - name: anomaly_score
+        description: "Largest absolute z-score of the three metrics."
+
+  - name: rpt_google_ads__narrative_context
+    description: >
+      One row per customer and week with payload_json, a compact pre-computed JSON document for a person or an LLM to
+      write a narrative from: totals with deltas, units and currency, top 5 campaign movers up and down by cost and by
+      conversions, top anomalies, top conversion actions, search terms with spend and no conversions, definitions and
+      data_through_date. No LLM is called by this package. Log payload_hash next to any generated text.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - week_start
+    columns:
+      - name: customer_id
+        description: "Google Ads customer (account) id."
+        tests: [not_null]
+      - name: week_start
+        description: "Monday of the week the payload describes."
+        tests: [not_null]
+      - name: week_end
+        description: "Sunday of the week."
+      - name: is_complete_week
+        description: "True if the whole week is in the past."
+      - name: data_through_date
+        description: "Latest day with data for the customer. A narrative must not describe later days."
+      - name: payload_json
+        description: "JSON payload built with to_json_string(struct(...)). Lists are ranked in SQL with fixed sorts and caps."
+        tests: [not_null]
+      - name: payload_hash
+        description: "md5 of payload_json, to trace generated text back to the numbers behind it."
